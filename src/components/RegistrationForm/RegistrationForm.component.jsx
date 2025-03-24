@@ -1,7 +1,8 @@
-import styles from './LoginForm.module.scss';
+import styles from './RegistrationForm.module.scss';
 import {useState} from "react";
+import {signUp} from "../../services/registration.service.js";
 
-const LoginFormComponent = () => {
+const RegistrationFormComponent = () => {
     const [formValue, setFormValue] = useState({
         email: "",
         password: "",
@@ -21,29 +22,29 @@ const LoginFormComponent = () => {
         ));
     }
 
-
     const submitForm = (event) => {
         event.preventDefault();
         setFormIsInvalid({
             email: '',
             password: '',
         })
-
-        // TODO API CALL
         if(!formValue.email || formValue.email.trim().length === 0) {
             setFormIsInvalid(prevState => ({...prevState, email: 'Inserire l\'indirizzo email'}));
         } else if(!formValue.email.includes("@")){
             setFormIsInvalid(prevState => ({...prevState, email: 'L\'indirizzo email deve contenere @'}));
         }
+
         if(formValue.password.length < 8){
             setFormIsInvalid(prevState => ({...prevState, password: 'La password deve contenere almeno 8 caratteri'}));
         }
 
-        if(formIsInvalid.email.length > 0 || formValue.password.length > 0 ){
-            return;
+        if (formIsInvalid.email.length > 0 || formIsInvalid.password.length > 0 ) {
+            return
         }
 
+        const signUpData = signUp(formValue);
 
+        console.log('REGISTRAZIONE AVVENUTA', signUpData);
     }
 
     return (
@@ -59,9 +60,9 @@ const LoginFormComponent = () => {
                 {formIsInvalid.password?.length > 0 && <p className={styles.error}>{formIsInvalid.password}</p>}
             </div>
 
-            <button type="submit" className={styles.submit_button}>Accedi</button>
+            <button type="submit" className={styles.submit_button}>Registrati</button>
         </form>
     )
 }
 
-export default LoginFormComponent
+export default RegistrationFormComponent
