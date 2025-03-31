@@ -1,65 +1,57 @@
-import styles from './LoginForm.module.scss';
 import {useState} from "react";
+import {isEmail, hasMinLength, isNotEmpty} from "../../utils/validators.js";
+import {login} from "../../services/login.service.js";
+import FormField from "../FormField/FormField.jsx";
+import Input from "../Input/Input.component.jsx";
+import useInput from "../../hooks/useInput.js";
 
-const LoginFormComponent = () => {
-    const [formValue, setFormValue] = useState({
-        email: "",
-        password: "",
-    });
+const LoginFormComponent = ({onLogin}) => {
+   const {value: emailValue, handleChange: handleEmailChange} = useInput("");
+   const {value: passwordValue, handleChange: handlePasswordChange} = useInput("");
 
-    const [formIsInvalid, setFormIsInvalid] = useState({
+    const [formErrors, setFormErrors] = useState({
         email: '',
         password: '',
     });
 
-    const handleChange = (event) => {
-        const {name, value} = event.target;
-        console.log(name, value)
-
-        setFormValue((prevState) => (
-            {...prevState, [name]: value}
-        ));
+    const handleFormErrorsChange = (key, value) => {
+        setFormErrors(prevState => ({...prevState, [key]: value}));
     }
 
 
-    const submitForm = (event) => {
+    const submitForm = async (event) => {
         event.preventDefault();
-        setFormIsInvalid({
+        setFormErrors({
             email: '',
             password: '',
         })
 
-        // TODO API CALL
-        if(!formValue.email || formValue.email.trim().length === 0) {
-            setFormIsInvalid(prevState => ({...prevState, email: 'Inserire l\'indirizzo email'}));
-        } else if(!formValue.email.includes("@")){
-            setFormIsInvalid(prevState => ({...prevState, email: 'L\'indirizzo email deve contenere @'}));
-        }
-        if(formValue.password.length < 8){
-            setFormIsInvalid(prevState => ({...prevState, password: 'La password deve contenere almeno 8 caratteri'}));
+        if(!isNotEmpty(emailValue)) {
+            handleFormErrorsChange('email', 'Inserire l\'indirizzo email');
+        } else if(!isEmail(emailValue)) {
+            handleFormErrorsChange('email', 'L\'indirizzo email deve contenere @');
         }
 
-        if(formIsInvalid.email.length > 0 || formValue.password.length > 0 ){
+        if(!hasMinLength(passwordValue, 8)) {
+            handleFormErrorsChange('password', 'La password deve contenere almeno 8 caratteri');
+        }
+
+        if(formErrors.email.length > 0 || formErrors.password.length > 0 ){
             return;
         }
 
-
+       const res = await login({email: emailValue, password: passwordValue});
+        if(res) {
+            localStorage.setItem('user', JSON.stringify(res));
+            onLogin(res);
+        }
     }
 
     return (
-        <form className={styles.form} onSubmit={submitForm} >
-            <div className={styles.form_field}>
-                <label htmlFor="email">Email</label>
-                <input type="text" name="email" value={formValue.email} onChange={handleChange} />
-                {formIsInvalid.email?.length > 0 && <p className={styles.error}>{formIsInvalid.email}</p>}
-            </div>
-            <div className={styles.form_field}>
-                <label htmlFor="password">Password</label>
-                <input type="password" name="password" value={formValue.password} onChange={handleChange} />
-                {formIsInvalid.password?.length > 0 && <p className={styles.error}>{formIsInvalid.password}</p>}
-            </div>
-
-            <button type="submit" className={styles.submit_button}>Accedi</button>
+        <form className="form" onSubmit={submitForm} >
+            <Input id="email" label="Email" error={formErrors.email} name="email"  onChange={handleEmailChange} type="text" value={emailValue}/>
+            <Input id="password" label="Password"  error={formErrors.password} name="password" onChange={handlePasswordChange} type="password" value={passwordValue}/>
+            <button type="submit" className="submit_button">Accedi</button>
         </form>
     )
 }

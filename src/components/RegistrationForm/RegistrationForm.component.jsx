@@ -1,66 +1,88 @@
-import styles from './RegistrationForm.module.scss';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {signUp} from "../../services/registration.service.js";
+import {hasMinLength, isEmail, isEqualToOtherValue, isNotEmpty} from "../../utils/validators.js";
+import Input from "../Input/Input.component.jsx";
+import useInput from "../../hooks/useInput.js";
 
 const RegistrationFormComponent = () => {
-    const [formValue, setFormValue] = useState({
-        email: "",
-        password: "",
-    });
+    const {value: nameValue, handleChange: handleNameChange} = useInput("");
+    const {value: emailValue, handleChange: handleEmailChange} = useInput("");
+    const {value: passwordValue, handleChange: handlePasswordChange} = useInput("");
+    const {value: confirmPasswordValue, handleChange: handleConfirmPasswordChange} = useInput("");
 
-    const [formIsInvalid, setFormIsInvalid] = useState({
+    const [formErrors, setFormErrors] = useState({
+        displayName: "",
         email: '',
         password: '',
+        confirmPassword: '',
     });
 
-    const handleChange = (event) => {
-        const {name, value} = event.target;
-        console.log(name, value)
 
-        setFormValue((prevState) => (
-            {...prevState, [name]: value}
-        ));
+    useEffect(() => {
+        console.log(formErrors);
+    }, [formErrors]);
+
+
+    const handleFormErrorsChange = (key, value) => {
+        setFormErrors(prevState => ({...prevState, [key]: value}));
     }
 
-    const submitForm = (event) => {
+    const submitForm = async (event) => {
         event.preventDefault();
-        setFormIsInvalid({
+        setFormErrors({
+            displayName: '',
             email: '',
             password: '',
+            confirmPassword: '',
         })
-        if(!formValue.email || formValue.email.trim().length === 0) {
-            setFormIsInvalid(prevState => ({...prevState, email: 'Inserire l\'indirizzo email'}));
-        } else if(!formValue.email.includes("@")){
-            setFormIsInvalid(prevState => ({...prevState, email: 'L\'indirizzo email deve contenere @'}));
+        const isNameValid = isNotEmpty(nameValue);
+        const isEmailValid = isNotEmpty(emailValue) && isEmail(emailValue);
+        const isPasswordValid = hasMinLength(passwordValue, 8);
+        const passwordsMatch = isEqualToOtherValue(passwordValue, confirmPasswordValue);
+
+        if (!isNameValid) {
+            handleFormErrorsChange('displayName', 'Inserisci il nome');
         }
 
-        if(formValue.password.length < 8){
-            setFormIsInvalid(prevState => ({...prevState, password: 'La password deve contenere almeno 8 caratteri'}));
+        if (!isNotEmpty(emailValue)) {
+            handleFormErrorsChange('email', 'Inserire l\'indirizzo email');
+        } else if (!isEmail(emailValue)) {
+            handleFormErrorsChange('email', 'L\'indirizzo email deve contenere @');
         }
 
-        if (formIsInvalid.email.length > 0 || formIsInvalid.password.length > 0 ) {
+        if (!isPasswordValid) {
+            handleFormErrorsChange('password', 'La password deve contenere almeno 8 caratteri');
+        }
+
+        if (!passwordsMatch) {
+            handleFormErrorsChange('confirmPassword', 'Le password devono corrispondere');
+        }
+
+        if (!isNameValid || !isEmailValid || !isPasswordValid || !passwordsMatch) {
             return
         }
 
-        const signUpData = signUp(formValue);
+        const payload = {
+            displayName: nameValue,
+            email: emailValue,
+            password: passwordValue,
+        }
 
-        console.log('REGISTRAZIONE AVVENUTA', signUpData);
+        await signUp(payload);
     }
 
     return (
-        <form className={styles.form} onSubmit={submitForm} >
-            <div className={styles.form_field}>
-                <label htmlFor="email">Email</label>
-                <input type="text" name="email" value={formValue.email} onChange={handleChange} />
-                {formIsInvalid.email?.length > 0 && <p className={styles.error}>{formIsInvalid.email}</p>}
-            </div>
-            <div className={styles.form_field}>
-                <label htmlFor="password">Password</label>
-                <input type="password" name="password" value={formValue.password} onChange={handleChange} />
-                {formIsInvalid.password?.length > 0 && <p className={styles.error}>{formIsInvalid.password}</p>}
-            </div>
+        <form className="form" onSubmit={submitForm}>
+            <Input id="displayName" label="Nome" error={formErrors.displayName} name="displayName"
+                   value={nameValue} onChange={handleNameChange} type="text"/>
+            <Input id="email" label="Email" error={formErrors.email} name="email" value={emailValue}
+                   onChange={handleEmailChange} type="text"/>
+            <Input id="password" label="Password" error={formErrors.password} name="password" value={passwordValue}
+                   onChange={handlePasswordChange} type="password"/>
+            <Input id="confirmPassword" label="Conferma password" error={formErrors.confirmPassword}
+                   name="confirmPassword" value={confirmPasswordValue} onChange={handleConfirmPasswordChange} type="password"/>
 
-            <button type="submit" className={styles.submit_button}>Registrati</button>
+            <button type="submit" className="submit_button">Registrati</button>
         </form>
     )
 }

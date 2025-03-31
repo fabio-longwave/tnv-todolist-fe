@@ -1,6 +1,6 @@
 export const signUp = async (signUpData) => {
     try {
-        const response = await fetch("http://localhost:8000/user", {
+        const response = await fetch('http://localhost:8000/user', {
             method: "POST",
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(signUpData)

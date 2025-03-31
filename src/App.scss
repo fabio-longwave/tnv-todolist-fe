@@ -51,3 +51,15 @@
   color:#ffffff;
   transition:all .3s ease-in-out;
 }
+
+//FORM
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap:10px;
+}
+
+.submit_button {
+  margin-top: 1rem;
+}
