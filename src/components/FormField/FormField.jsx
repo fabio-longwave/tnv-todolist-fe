@@ -1,4 +1,5 @@
-import styles from './FormField.module.scss'
+import styles from './FormField.module.scss';
+
 const FormField = ({id, label, error, children}) => {
     return (
         <div className={styles.form_field}>

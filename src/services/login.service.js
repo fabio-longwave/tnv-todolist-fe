@@ -1,5 +1,4 @@
 export const login = async (loginData) => {
-    console.log('loginData', loginData);
     try {
         const response = await fetch("http://localhost:8000/user/login", {
             method: "POST",
