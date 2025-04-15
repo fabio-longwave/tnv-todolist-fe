@@ -1,11 +1,12 @@
 import App from "./App.jsx";
 import LoginFormComponent from "./components/LoginForm/LoginForm.component.jsx";
 import RegistrationFormComponent from "./components/RegistrationForm/RegistrationForm.component.jsx";
-import ErrorPage from "./components/ErrorPage/ErrorPage.jsx";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.jsx";
-import MoviesList from "./components/MoviesList/MoviesList.jsx";
+import ActivityList from "./components/Activities/ActivityList/ActivityList.jsx";
 import AuthLayout from "./components/AuthLayout/AuthLayout.jsx";
 import MainLayout from "./components/MainLayout/MainLayout.jsx";
+import ErrorPage from "./components/ErrorPage/ErrorPage.jsx";
+import ActivitiesPage from "./components/Activities/ActivitiesPage/ActivitiesPage.jsx";
 
 export const routes = [
     {
@@ -33,14 +34,10 @@ export const routes = [
                         element: <ProtectedRoute/>,
                         children: [
                             {
-                                path: 'movies',
-                                element: <MoviesList/>,
+                                path: 'activities',
+                                element: <ActivitiesPage/>,
                             }
                         ]
-                    },
-                    {
-                        path: 'movies-not-auth',
-                        element: <MoviesList/>,
                     }
                 ]
             }

@@ -48,7 +48,7 @@ const LoginFormComponent = () => {
         const user = await login({email: emailValue, password: passwordValue});
         if (user) {
             localStorage.setItem('user', JSON.stringify(user));
-            navigate('/movies');
+            navigate('/activities');
         }
     }
 
@@ -62,7 +62,7 @@ const LoginFormComponent = () => {
                 <Input id="password" label="Password" error={formErrors.password} name="password"
                        onChange={handlePasswordChange} type="password" value={passwordValue}/>
                 <div className={styles.registrationLink}>
-                    <Link to={'/register'}>Registrati</Link>
+                    <Link to="/register">Registrati</Link>
                 </div>
                 <button type="submit" className="submit_button">Accedi</button>
             </form>
