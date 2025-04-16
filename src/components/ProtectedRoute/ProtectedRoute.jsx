@@ -1,10 +1,11 @@
 import {Outlet, useNavigate} from "react-router";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
+import {userSelector} from "../../reducers/user.slice.js";
+import {useSelector} from "react-redux";
 
 const ProtectedRoute = () => {
-    const USER = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : {};
     const navigate = useNavigate();
-    const [user, setUser] = useState(USER);
+    const user = useSelector(userSelector)
 
     useEffect(() => {
         if (!user.accessToken) {

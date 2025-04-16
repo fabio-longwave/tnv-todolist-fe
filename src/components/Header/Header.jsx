@@ -4,16 +4,17 @@ import {FaArrowRightFromBracket, FaArrowRightToBracket} from "react-icons/fa6";
 import {useNavigate} from "react-router";
 import {ThemeContext} from "../../contexts/ThemeProvider.jsx";
 import {FaMoon, FaSun} from "react-icons/fa";
+import {useDispatch, useSelector} from "react-redux";
+import {clearUser, userSelector} from "../../reducers/user.slice.js";
 
-const USER = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
 
 const Header = () => {
     const {theme, switchTheme} = useContext(ThemeContext)
     const navigate = useNavigate();
-    const [user, setUser] = useState(USER);
+    const user = useSelector(userSelector)
+    const dispatch = useDispatch();
     const logout = () => {
-        localStorage.removeItem('user');
-        setUser(null);
+        dispatch(clearUser());
         navigate('/');
     }
 

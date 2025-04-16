@@ -2,11 +2,14 @@ import {TabPanel, Tabs} from "../../Tabs/Tabs.jsx";
 import ActivityList from "../ActivityList/ActivityList.jsx";
 import {useCallback, useEffect, useState} from "react";
 import {getActivities} from "../../../services/activity.service.js";
+import Loader from "../../Loader/Loader.component.jsx";
+import {useSelector} from "react-redux";
+import {userSelector} from "../../../reducers/user.slice.js";
 
 const ActivitiesPage = () => {
-    const USER = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : {};
-    const [user, setUser] = useState(USER);
     const [activities, setActivities] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const user = useSelector(userSelector);
     const status = [
         {
             label: 'Aperte',
@@ -22,15 +25,18 @@ const ActivitiesPage = () => {
         }
     ]
 
+
     const filterActivitiesByStatus = (status) => {
         return activities.filter(activity => activity.status === status)
     }
 
     const retrieveActivities = useCallback(async () => {
+        setIsLoading(true);
         if(user.accessToken){
           const data = await getActivities(user.accessToken)
             if(data){
                 setActivities(data)
+                setIsLoading(false);
             }
         }
     }, [])
@@ -47,8 +53,10 @@ const ActivitiesPage = () => {
         <Tabs>
             {status.map((s) => {
                 return  <TabPanel header={s.label} key={s.value}>
-                    <div>{s.label}</div>
-                    <ActivityList activities={filterActivitiesByStatus(s.value)}></ActivityList>
+                    {!isLoading ?
+                        <ActivityList activities={filterActivitiesByStatus(s.value)}></ActivityList> :
+                        <Loader />
+                    }
                 </TabPanel>
             })}
         </Tabs>

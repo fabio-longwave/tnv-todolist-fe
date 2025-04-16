@@ -7,9 +7,12 @@ import Logo from "../../assets/logo-tnv-academy.png"
 import styles from "./LoginForm.module.scss"
 import {Link, useNavigate} from "react-router";
 import {ThemeContext} from "../../contexts/ThemeProvider.jsx";
+import {useDispatch} from "react-redux";
+import {setUser} from "../../reducers/user.slice.js";
 
 const LoginFormComponent = () => {
     const {theme, switchTheme} = useContext(ThemeContext)
+    const dispatch = useDispatch();
 
     const navigate = useNavigate();
     const {value: emailValue, handleChange: handleEmailChange} = useInput("");
@@ -47,7 +50,7 @@ const LoginFormComponent = () => {
 
         const user = await login({email: emailValue, password: passwordValue});
         if (user) {
-            localStorage.setItem('user', JSON.stringify(user));
+            dispatch(setUser(user));
             navigate('/activities');
         }
     }
@@ -55,7 +58,7 @@ const LoginFormComponent = () => {
     return (
         <div className="card">
             <img src={Logo} className="logo" alt="logo"/>
-            <h2>Accedi {theme}</h2>
+            <h2>Accedi</h2>
             <form className="form" onSubmit={submitForm}>
                 <Input id="email" label="Email" error={formErrors.email} name="email" onChange={handleEmailChange}
                        type="text" value={emailValue}/>
