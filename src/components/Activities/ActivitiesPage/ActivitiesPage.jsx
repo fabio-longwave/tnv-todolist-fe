@@ -3,11 +3,13 @@ import ActivityList from "../ActivityList/ActivityList.jsx";
 import {useCallback, useEffect, useState} from "react";
 import {getActivities} from "../../../services/activity.service.js";
 import Loader from "../../Loader/Loader.component.jsx";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {userSelector} from "../../../reducers/user.slice.js";
+import {activitySelector, setActivities} from "../../../reducers/activity.slice.js";
 
 const ActivitiesPage = () => {
-    const [activities, setActivities] = useState([]);
+    const activities = useSelector(activitySelector);
+    const dispatch = useDispatch();
     const [isLoading, setIsLoading] = useState(false);
     const user = useSelector(userSelector);
     const status = [
@@ -35,7 +37,7 @@ const ActivitiesPage = () => {
         if(user.accessToken){
           const data = await getActivities(user.accessToken)
             if(data){
-                setActivities(data)
+                dispatch(setActivities(data))
                 setIsLoading(false);
             }
         }

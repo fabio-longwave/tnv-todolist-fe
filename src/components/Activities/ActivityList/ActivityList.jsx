@@ -5,9 +5,8 @@ const ActivityList = ({activities}) => {
         <>
             {activities.length > 0 ?
                 activities?.map(activity => (
-                <div key={activity['_id']}>{activity.name}</div>
-            )) : <div>Nessun Elemento in lista</div>}
-            {/*<ActivityItem activity={activity} />*/}
+                    <ActivityItem key={activity['_id']} activity={activity}/>
+                )) : <div>Nessun Elemento in lista</div>}
         </>
     )
 }
