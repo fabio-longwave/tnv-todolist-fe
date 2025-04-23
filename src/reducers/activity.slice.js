@@ -1,4 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
+import {getActivities} from "../services/activity.service.js";
 
 const initialState = {
     activities: []
@@ -10,6 +11,14 @@ export const activitySlice = createSlice({
     reducers: {
         setActivities: (state, action) => {
             state.activities = action.payload;
+        },
+        addActivity: (state, action) => {
+            console.log('ACTIOOOOOOOON', action.payload)
+            state.activities.push(action.payload);
+        },
+        updateActivity: (state, action) => {
+            const activityIndex = state.activities.findIndex(activity => activity["_id"] === action.payload["_id"]);
+            state.activities[activityIndex] = action.payload;
         },
         updateStatus: (state, action) => {
             state.activities = state.activities.map(activity => {
@@ -26,6 +35,13 @@ export const activitySlice = createSlice({
     }
 });
 
-export const {setActivities, updateStatus, removeActivity, clearActivities} = activitySlice.actions;
+export const {
+    setActivities,
+    addActivity,
+    updateActivity,
+    updateStatus,
+    removeActivity,
+    clearActivities
+} = activitySlice.actions;
 
 export const activitySelector = (state) => state.activity.activities

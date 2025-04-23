@@ -1,16 +1,25 @@
 import styles from './ActivityItem.module.scss';
 import {format} from "date-fns";
 import {FaArchive, FaArrowLeft, FaCheck, FaEdit, FaEye, FaTrash} from "react-icons/fa";
-import {changeActivityStatus, deleteActivity} from "../../../services/activity.service.js";
+import {
+    changeActivityStatus,
+    createActivity,
+    deleteActivity,
+    editActivity
+} from "../../../services/activity.service.js";
 import {useDispatch, useSelector} from "react-redux";
 import {userSelector} from "../../../reducers/user.slice.js";
 import config from "../../../../config.js";
-import {removeActivity, updateStatus} from "../../../reducers/activity.slice.js";
+import {addActivity, removeActivity, updateStatus, updateActivity} from "../../../reducers/activity.slice.js";
+import {createPortal} from "react-dom";
+import Modal from "../../Modal/Modal.jsx";
+import AddEditActivity from "../AddEditActivity/AddEditActivity.jsx";
+import {useState} from "react";
 
 const ActivityItem = ({activity}) => {
-    const user = useSelector(userSelector);
+    const user = useSelector(userSelector)
     const dispatch = useDispatch();
-
+    const [editActivityOpen, setEditActivityOpen] = useState(false);
     const changeStatus = async (action) => {
         const data = await changeActivityStatus(activity["_id"], action, user.accessToken)
         console.log(data);
@@ -24,6 +33,21 @@ const ActivityItem = ({activity}) => {
             dispatch(removeActivity(activity["_id"]));
         }).catch(e => console.error(e));
     }
+    const handleEditActivity = async  (updatedActivity) => {
+        const data = await editActivity(updatedActivity, activity["_id"], user.accessToken);
+
+        if(data) {
+            dispatch(updateActivity(data));
+            setEditActivityOpen(false);
+        }
+    }
+
+    const EditActivityModal = <Modal isOpen={editActivityOpen} onClose={() => setEditActivityOpen(false)} header="Aggiungi Attività">
+        <AddEditActivity activity={activity} onSubmit={handleEditActivity}/>
+        <div className="modal__buttons">
+            <button type="submit" form="add-edit-activity" className="button">Aggiorna attivit&agrave;</button>
+        </div>
+    </Modal>
 
 
     return <div className={styles.todoItem}>
@@ -52,7 +76,7 @@ const ActivityItem = ({activity}) => {
                         <FaArchive />
                     </button>
                 </>}
-                <button>
+                <button onClick={() => setEditActivityOpen(true)} >
                     <FaEdit />
                 </button>
                 <button className="delete__button" onClick={delActivity}>
@@ -60,6 +84,8 @@ const ActivityItem = ({activity}) => {
                 </button>
             </div>
         </div>
+        {createPortal(EditActivityModal, document.body)}
+
     </div>
 }
 
