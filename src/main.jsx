@@ -9,6 +9,7 @@ import {ThemeProvider} from "./contexts/ThemeProvider.jsx";
 import {Provider} from "react-redux";
 import {store, persistor} from "./store/store.js";
 import {PersistGate} from "redux-persist/integration/react";
+import './i18n/i18n.js';
 
 const router = createBrowserRouter(routes)
 

@@ -3,20 +3,21 @@ import {format} from "date-fns";
 import {FaArchive, FaArrowLeft, FaCheck, FaEdit, FaEye, FaTrash} from "react-icons/fa";
 import {
     changeActivityStatus,
-    createActivity,
     deleteActivity,
     editActivity
 } from "../../../services/activity.service.js";
 import {useDispatch, useSelector} from "react-redux";
 import {userSelector} from "../../../reducers/user.slice.js";
 import config from "../../../../config.js";
-import {addActivity, removeActivity, updateStatus, updateActivity} from "../../../reducers/activity.slice.js";
+import {removeActivity, updateStatus, updateActivity} from "../../../reducers/activity.slice.js";
 import {createPortal} from "react-dom";
 import Modal from "../../Modal/Modal.jsx";
 import AddEditActivity from "../AddEditActivity/AddEditActivity.jsx";
 import {useState} from "react";
+import {useNavigate} from "react-router";
 
 const ActivityItem = ({activity}) => {
+    const navigate = useNavigate();
     const user = useSelector(userSelector)
     const dispatch = useDispatch();
     const [editActivityOpen, setEditActivityOpen] = useState(false);
@@ -50,6 +51,10 @@ const ActivityItem = ({activity}) => {
     </Modal>
 
 
+    const goToDetail = () => {
+        navigate(`/activity/${activity["_id"]}`)
+    }
+
     return <div className={styles.todoItem}>
         <div className={styles.todoDate}>
            Da fare entro: {format(new Date(activity.dueDate), 'dd/MM/yyyy')}
@@ -60,7 +65,7 @@ const ActivityItem = ({activity}) => {
                 <div>{activity.description}</div>
             </div>
             <div className={styles.buttons}>
-                <button>
+                <button onClick={goToDetail}>
                     <FaEye />
                 </button>
                 {activity.status === 'open' && <>

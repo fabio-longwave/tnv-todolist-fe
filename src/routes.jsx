@@ -7,6 +7,7 @@ import AuthLayout from "./components/AuthLayout/AuthLayout.jsx";
 import MainLayout from "./components/MainLayout/MainLayout.jsx";
 import ErrorPage from "./components/ErrorPage/ErrorPage.jsx";
 import ActivitiesPage from "./components/Activities/ActivitiesPage/ActivitiesPage.jsx";
+import ActivityDetailPage from "./components/Activities/ActivityDetailPage/ActivityDetailPage.jsx";
 
 export const routes = [
     {
@@ -36,6 +37,10 @@ export const routes = [
                             {
                                 path: 'activities',
                                 element: <ActivitiesPage/>,
+                            },
+                            {
+                                path: 'activity/:id',
+                                element: <ActivityDetailPage/>,
                             }
                         ]
                     }

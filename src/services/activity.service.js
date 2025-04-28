@@ -16,6 +16,23 @@ export const getActivities = async (token) => {
     }
 }
 
+export const getActivity = async (id, token) => {
+    try {
+        const response = await fetch(`${config.api.baseUrl}/${config.api.paths.activity}/${id}`, {
+            method: "GET",
+            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+        })
+        const data = await response.json();
+
+        if (response.ok) {
+            return data
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
 export const createActivity = async (activity, token) => {
     try {
         const response = await fetch(`${config.api.baseUrl}/${config.api.paths.activity}`, {
