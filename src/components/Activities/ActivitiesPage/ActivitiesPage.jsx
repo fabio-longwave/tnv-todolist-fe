@@ -9,13 +9,15 @@ import {activitySelector, setActivities, addActivity} from "../../../reducers/ac
 import AddEditActivity from "../AddEditActivity/AddEditActivity.jsx";
 import Modal from "../../Modal/Modal.jsx";
 import {createPortal} from "react-dom";
+import ActivityShareModal from "../ActivityShareModal/ActivityShareModal.jsx";
 
 const ActivitiesPage = () => {
     const activities = useSelector(activitySelector);
+    const user = useSelector(userSelector);
     const dispatch = useDispatch();
     const [isLoading, setIsLoading] = useState(false);
     const [addActivityOpen, setAddActivityOpen] = useState(false);
-    const user = useSelector(userSelector);
+    const [selectedUsers, setSelectedUsers] = useState([])
     const status = [
         {
             label: 'Aperte',
@@ -38,35 +40,49 @@ const ActivitiesPage = () => {
 
     const retrieveActivities = useCallback(async () => {
         setIsLoading(true);
-        if(user.accessToken){
-          const data = await getActivities(user.accessToken)
-            if(data){
+        if (user.accessToken) {
+            const data = await getActivities(user.accessToken).catch(e => {
+                alert('Errore nel recupero delle attivit&agrave;');
+                console.error(e);
+            });
+            if (data) {
                 dispatch(setActivities(data))
-                setIsLoading(false);
             }
+        } else {
+            console.error('No access token');
         }
+        setIsLoading(false);
     }, [])
 
 
-    useEffect( () => {
-       retrieveActivities().catch(e=> e)
+    useEffect(() => {
+        retrieveActivities().catch(e => e)
     }, []);
 
-    const handleCreateActivity = async  (activity) => {
-        const data = await createActivity(activity, user.accessToken);
+    const handleCreateActivity = async (activity) => {
+        if(selectedUsers.length > 0) {
+            activity.users = selectedUsers;
+        }
+        const data = await createActivity(activity, user.accessToken).catch(e => {
+            alert('Errore nel salvataggio dell\'attivit&agrave;');
+            console.error(e);
+        });
 
-        if(data) {
+        if (data) {
             dispatch(addActivity(data));
             setAddActivityOpen(false);
         }
     }
 
-    const AddActivityModal = <Modal isOpen={addActivityOpen} onClose={() => setAddActivityOpen(false)} header="Aggiungi Attività">
+    const AddActivityModal = <Modal isOpen={addActivityOpen} onClose={() => setAddActivityOpen(false)}
+                                    header="Aggiungi Attività">
         <AddEditActivity onSubmit={handleCreateActivity}/>
         <div className="modal__buttons">
-            <button type="submit" form="add-edit-activity" className="button">Salva attivit&agrave;</button>
+            <button type="submit" form="  -edit-activity" className="button">Salva attivit&agrave;</button>
         </div>
     </Modal>
+
+
 
     return <>
         <div style={{marginBottom: 20}}>
@@ -74,15 +90,16 @@ const ActivitiesPage = () => {
         </div>
         <Tabs>
             {status.map((s) => {
-                return  <TabPanel header={s.label} key={s.value}>
+                return <TabPanel header={s.label} key={s.value}>
                     {!isLoading ?
                         <ActivityList activities={filterActivitiesByStatus(s.value)}></ActivityList> :
-                        <Loader />
+                        <Loader/>
                     }
                 </TabPanel>
             })}
         </Tabs>
         {createPortal(AddActivityModal, document.body)}
+        {createPortal(<ActivityShareModal selectedUsers={selectedUsers} onConfirm={() => null} />, document.body)}
     </>
 }
 

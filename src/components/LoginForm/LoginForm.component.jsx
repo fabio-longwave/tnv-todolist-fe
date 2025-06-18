@@ -5,7 +5,7 @@ import Input from "../Input/Input.component.jsx";
 import useInput from "../../hooks/useInput.js";
 import Logo from "../../assets/logo-tnv-academy.png"
 import styles from "./LoginForm.module.scss"
-import {Link, useNavigate} from "react-router";
+import {Link, useNavigate} from "react-router-dom";
 import {ThemeContext} from "../../contexts/ThemeProvider.jsx";
 import {useDispatch} from "react-redux";
 import {setUser} from "../../reducers/user.slice.js";
@@ -44,7 +44,7 @@ const LoginFormComponent = () => {
             handleFormErrorsChange('password', 'La password deve contenere almeno 8 caratteri');
         }
 
-        if (formErrors.email.length > 0 || formErrors.password.length > 0) {
+        if (!isNotEmpty(emailValue)|| !isEmail(emailValue) || !hasMinLength(passwordValue, 8)) {
             return;
         }
 

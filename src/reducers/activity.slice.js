@@ -1,5 +1,4 @@
 import {createSlice} from "@reduxjs/toolkit";
-import {getActivities} from "../services/activity.service.js";
 
 const initialState = {
     activities: []
@@ -13,7 +12,6 @@ export const activitySlice = createSlice({
             state.activities = action.payload;
         },
         addActivity: (state, action) => {
-            console.log('ACTIOOOOOOOON', action.payload)
             state.activities.push(action.payload);
         },
         updateActivity: (state, action) => {

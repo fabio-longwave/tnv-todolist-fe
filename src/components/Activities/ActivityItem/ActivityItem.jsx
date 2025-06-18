@@ -9,21 +9,23 @@ import {
 import {useDispatch, useSelector} from "react-redux";
 import {userSelector} from "../../../reducers/user.slice.js";
 import config from "../../../../config.js";
-import {removeActivity, updateStatus, updateActivity} from "../../../reducers/activity.slice.js";
+import { updateStatus, updateActivity} from "../../../reducers/activity.slice.js";
 import {createPortal} from "react-dom";
 import Modal from "../../Modal/Modal.jsx";
 import AddEditActivity from "../AddEditActivity/AddEditActivity.jsx";
 import {useState} from "react";
 import {useNavigate} from "react-router";
 
+
 const ActivityItem = ({activity}) => {
     const navigate = useNavigate();
     const user = useSelector(userSelector)
     const dispatch = useDispatch();
     const [editActivityOpen, setEditActivityOpen] = useState(false);
+
     const changeStatus = async (action) => {
         const data = await changeActivityStatus(activity["_id"], action, user.accessToken)
-        console.log(data);
+
         if(data){
             dispatch(updateStatus(data));
         }
@@ -31,7 +33,7 @@ const ActivityItem = ({activity}) => {
 
     const delActivity = async () => {
         deleteActivity(activity["_id"], user.accessToken).then(() => {
-            dispatch(removeActivity(activity["_id"]));
+            dispatch(updateStatus({...activity, status: 'deleted'}));
         }).catch(e => console.error(e));
     }
     const handleEditActivity = async  (updatedActivity) => {

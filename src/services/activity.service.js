@@ -47,7 +47,7 @@ export const createActivity = async (activity, token) => {
         }
 
     } catch (error) {
-        console.error(error);
+        return error
     }
 }
 

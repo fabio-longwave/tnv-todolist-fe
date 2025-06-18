@@ -1,0 +1,60 @@
+// import { describe, it } from 'vitest';
+// import { render, screen } from '@testing-library/react'
+// import App from '../App'
+//
+// describe('App', () => {
+//     it('renders the App component', () => {
+//         render(<App />)
+//
+//         screen.debug(); // prints out the jsx in the App component unto the command line
+//     })
+// }
+// noinspection TypeScriptValidateTypes
+
+
+// 1. Importazioni necessarie
+// Con Vitest e globals: true, `describe`, `it`, `expect` sono globali.
+// import { describe, it, expect } from 'vitest'; // Non necessario se globals: true
+import React from 'react';
+import {vi, describe, it, expect,} from 'vitest';
+import {render, screen} from '@testing-library/react';
+import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
+import {login} from "../services/login.service.js";
+import LoginFormComponent from "../components/LoginForm/LoginForm.component.jsx";
+
+const mockedUsedNavigate = vi.fn();  //keep it at top of file
+const mockedUsedDispatch = vi.fn();  //keep it at top of file
+
+describe('FormComponent', () => {
+    it('should return user data with access token', async () => {
+        vi.mock('react-router', () => {
+            return {
+                ...vi.importActual('react-router'),  // for vitest
+                useNavigate: () => mockedUsedNavigate,
+                Link: 'Link',
+            };
+        });
+        vi.mock('react-redux', () => {
+            return {
+                ...vi.importActual('react-redux'),  // for vitest
+                useDispatch: () => mockedUsedDispatch,
+            };
+        });
+        window.fetch = vi.fn(async () => ({
+            ok: true,
+            json: async () => ({user: {email: '<EMAIL>', accessToken: '123456789'}})
+        }))
+        const submitForm = vi.fn(async () => ({test: 'ok'}));
+        render(<LoginFormComponent/>);
+        const user = userEvent.setup()
+
+
+        await user.type(screen.getByLabelText('Email'), 'email@email.com');
+        await user.type(screen.getByLabelText('Password'), 'password');
+        await user.click(screen.getByRole('button', {name: /accedi/i}));
+
+        expect(submitForm).toHaveBeenCalledTimes(1);
+
+    });
+});
