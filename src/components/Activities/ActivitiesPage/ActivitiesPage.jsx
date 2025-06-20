@@ -33,7 +33,6 @@ const ActivitiesPage = () => {
         }
     ]
 
-
     const filterActivitiesByStatus = (status) => {
         return activities.filter(activity => activity.status === status)
     }

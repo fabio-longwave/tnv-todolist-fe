@@ -16,7 +16,7 @@ const RegistrationFormComponent = () => {
     const {value: confirmPasswordValue, handleChange: handleConfirmPasswordChange} = useInput("");
 
     const [formErrors, setFormErrors] = useState({
-        displayName: "",
+        username: "",
         email: '',
         password: '',
         confirmPassword: '',
@@ -34,7 +34,7 @@ const RegistrationFormComponent = () => {
     const submitForm = async (event) => {
         event.preventDefault();
         setFormErrors({
-            displayName: '',
+            username: '',
             email: '',
             password: '',
             confirmPassword: '',
@@ -45,7 +45,7 @@ const RegistrationFormComponent = () => {
         const passwordsMatch = isEqualToOtherValue(passwordValue, confirmPasswordValue);
 
         if (!isNameValid) {
-            handleFormErrorsChange('displayName', 'Inserisci il nome');
+            handleFormErrorsChange('username', 'Inserisci il nome');
         }
 
         if (!isNotEmpty(emailValue)) {
@@ -67,7 +67,7 @@ const RegistrationFormComponent = () => {
         }
 
         const payload = {
-            displayName: nameValue,
+            username: nameValue,
             email: emailValue,
             password: passwordValue,
         }
@@ -83,7 +83,7 @@ const RegistrationFormComponent = () => {
             <img src={Logo} className="logo" alt="logo"/>
             <h2>Registrati</h2>
             <form className="form" onSubmit={submitForm}>
-                <Input id="displayName" label="Nome" error={formErrors.displayName} name="displayName"
+                <Input id="username" label="Nome" error={formErrors.username} name="username"
                        value={nameValue} onChange={handleNameChange} type="text"/>
                 <Input id="email" label="Email" error={formErrors.email} name="email" value={emailValue}
                        onChange={handleEmailChange} type="text"/>

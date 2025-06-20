@@ -12,7 +12,7 @@ const resources = {
     }
 };
 
-await i18n
+i18n
     .use(initReactI18next)
     .init({
         resources,
@@ -23,6 +23,6 @@ await i18n
         interpolation: {
             escapeValue: false // react already safes from xss
         }
-    });
+    }).catch(e => console.log(e));
 
 export default i18n;
