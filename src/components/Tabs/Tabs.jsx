@@ -1,17 +1,22 @@
 import {useState} from "react";
 import styles from "./Tabs.module.scss";
 
-export const Tabs = ({children}) => {
+export const Tabs = ({children, onTabChange}) => {
     const [activeTab, setActiveTab] = useState(0);
 
     const tabHeaders = [];
     const tabContent = [];
 
+    const handleTabChange = (index, props) => {
+        setActiveTab(index);
+        onTabChange(props);
+    }
+
     children.forEach((child, index) => {
         tabHeaders.push(
             <button key={index}
                     className={`${styles['tab-button']} ${activeTab === index ? styles.active : ""}`}
-                    onClick={() => setActiveTab(index)}>
+                    onClick={() => handleTabChange(index, child.props)}>
                 {child.props.header}
             </button>
         )
@@ -25,6 +30,6 @@ export const Tabs = ({children}) => {
     </section>
 }
 
-export const TabPanel = ({header, children}) => {
+export const TabPanel = ({header, children, ...props}) => {
     return <div>{children}</div>
 }

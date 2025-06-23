@@ -67,7 +67,7 @@ const RegistrationFormComponent = () => {
         }
 
         const payload = {
-            username: nameValue,
+            // username: nameValue,
             email: emailValue,
             password: passwordValue,
         }
