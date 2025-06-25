@@ -4,7 +4,6 @@ import {FaArchive, FaArrowLeft, FaCheck, FaEdit, FaEye, FaTrash} from "react-ico
 import {
     changeActivityStatus,
     deleteActivity,
-    editActivity
 } from "../../../services/activity.service.js";
 import {useDispatch, useSelector} from "react-redux";
 import {userSelector} from "../../../reducers/user.slice.js";
@@ -15,6 +14,7 @@ import Modal from "../../Modal/Modal.jsx";
 import AddEditActivity from "../AddEditActivity/AddEditActivity.jsx";
 import {useState} from "react";
 import {useNavigate} from "react-router";
+import useSocketEmit from "../../../hooks/useSocketEmit.js";
 
 
 const ActivityItem = ({activity}) => {
@@ -22,7 +22,7 @@ const ActivityItem = ({activity}) => {
     const user = useSelector(userSelector)
     const dispatch = useDispatch();
     const [editActivityOpen, setEditActivityOpen] = useState(false);
-
+    const {editActivity} = useSocketEmit();
     const changeStatus = async (action) => {
         const data = await changeActivityStatus(activity["_id"], action, user.accessToken)
 
@@ -37,7 +37,7 @@ const ActivityItem = ({activity}) => {
         }).catch(e => console.error(e));
     }
     const handleEditActivity = async  (updatedActivity) => {
-        const data = await editActivity(updatedActivity, activity["_id"], user.accessToken);
+        const data = await editActivity(updatedActivity);
 
         if(data) {
             dispatch(updateActivity(data));

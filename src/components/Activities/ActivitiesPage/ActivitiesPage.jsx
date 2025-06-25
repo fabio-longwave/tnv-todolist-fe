@@ -4,7 +4,7 @@ import {useCallback, useContext, useEffect, useState} from "react";
 import Loader from "../../Loader/Loader.component.jsx";
 import {useDispatch, useSelector} from "react-redux";
 import {userSelector} from "../../../reducers/user.slice.js";
-import {activitySelector, setActivities, addActivity} from "../../../reducers/activity.slice.js";
+import {activitySelector, setActivities, addActivity, clearActivities} from "../../../reducers/activity.slice.js";
 import AddEditActivity from "../AddEditActivity/AddEditActivity.jsx";
 import Modal from "../../Modal/Modal.jsx";
 import {createPortal} from "react-dom";
@@ -22,23 +22,28 @@ const ActivitiesPage = () => {
     const [addActivityOpen, setAddActivityOpen] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState([])
     const {getActivities, createActivity} = useSocketEmit();
+    const [lazyState, setLazyState] = useState({
+        skip:0,
+        limit:5,
+        status: [config.status.OPEN.value]
+    })
+    const [noMoreActivities, setNoMoreActivities] = useState(false);
 
-    const retrieveActivities = async (status) => {
+    const retrieveActivities = async () => {
         setIsLoading(true);
-        const payload = {
-            skip: 0,
-            limit: 100,
-            status: status,
-        }
-        const data = await getActivities(payload).catch(e => {
-            //alert('Errore nel recupero delle attivit&agrave;');
+        const data = await getActivities(lazyState).catch(e => {
             if(e.status === 404) {
-                dispatch(setActivities([]))
+                setNoMoreActivities(true);
             }
             console.error(e);
         });
         if (data) {
-            dispatch(setActivities(data.activities))
+            setNoMoreActivities(false);
+            if(lazyState.skip === 0){
+                dispatch(setActivities(data.activities))
+            } else {
+                dispatch(setActivities([...activities, ...data.activities]))
+            }
         }
         setIsLoading(false);
     }
@@ -46,13 +51,18 @@ const ActivitiesPage = () => {
 
     useEffect(() => {
         if (socketReady && socket) {
-            retrieveActivities([config.status.OPEN.value]).catch(e => e)
+            retrieveActivities().catch(e => e)
         }
-    }, [socketReady, socket]);
+    }, [socketReady, socket, lazyState]);
 
-    const handleStatusChange = async (props) => {
-        console.log(props)
-        await retrieveActivities([props.status]);
+
+    const handleStatusChange = (props) => {
+        dispatch(clearActivities())
+        setLazyState({...lazyState, skip:0, status: [props.status]})
+    }
+
+    const handleLoadMoreActivities = () => {
+        setLazyState({...lazyState, skip: lazyState.skip + lazyState.limit})
     }
 
     const handleCreateActivity = async (activity) => {
@@ -64,7 +74,6 @@ const ActivitiesPage = () => {
             alert('Errore nel salvataggio dell\'attivit&agrave;');
             console.error(e);
         });
-
 
         if (data) {
             await dispatch(addActivity(data));
@@ -89,7 +98,7 @@ const ActivitiesPage = () => {
             {Object.values(config.status).map((s) => {
                 return <TabPanel header={s.label} key={s.value} status={s.value}>
                     {!isLoading ?
-                        <ActivityList activities={activities}></ActivityList> :
+                        <ActivityList activities={activities} onLoadMore={handleLoadMoreActivities} hideButton={noMoreActivities}></ActivityList> :
                         <Loader/>
                     }
                 </TabPanel>

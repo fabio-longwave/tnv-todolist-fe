@@ -17,6 +17,9 @@ const AddEditActivity = ({ activity, onSubmit }) => {
             name: nameValue,
             description: descriptionValue,
         }
+        if(activity) {
+            payload.id = activity.id
+        }
 
         onSubmit(payload)
     }

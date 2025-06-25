@@ -68,6 +68,13 @@ button {
   background-color: #1a1a1a;
   cursor: pointer;
   transition: all 0.25s;
+
+  &.text{
+    background: transparent;
+    color: #1a1a1a;
+    text-decoration: underline;
+    border:0;
+  }
 }
 
 button:hover {
